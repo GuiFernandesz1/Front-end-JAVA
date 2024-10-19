@@ -33,20 +33,45 @@ public class TelaDeLogin extends JFrame
 
         lblNotificacoes = new JLabel("Notificações");
         add(lblNotificacoes);
+
+        ButtonHandler buttonHandler = new ButtonHandler();
+        btnLogar.addActionListener(buttonHandler);
+
+        txtPassBox.addKeyListener(
+            new KeyAdapter() {
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    if (String.valueOf(txtPassBox.getPassword()).trim().length() > 0) {
+                        if (e.getKeyCode() == 10) {
+                            System.out.println("Você teclou Enter");
+                            logar();
+                        }
+                    }
+                }
+            }
+        );
     }
 
     private class ButtonHandler implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent event) {
-            try {
+            logar();
+        }
+    }
+
+    public void logar() {
+        try {
             Connection conexao = MySQLConnector.conectar();
             String strSqlLogin = "select * from `db_senac`.`tbl_senac` where email = '" +
-            txtLoginBox.getText() + "'and senha = '" + String.valueOf(txtPassBox.getPassword()) + "';";
+            txtLoginBox.getText() + "' and senha = '" + String.valueOf(txtPassBox.getPassword()) + "';";
             Statement stmSqlLogin = conexao.createStatement();
             ResultSet rstSqlLogin = stmSqlLogin.executeQuery(strSqlLogin);
             if (rstSqlLogin.next()) {
+                notificarUsuario("Login realizado com sucesso!");
                 // aqui notificamos o usuário que seu login e senha foram encontrados
             } else {
+                notificarUsuario("Não foi possível realizar o login, verifique seu usuário e senha e tente novamente.");
+
                 // já aqui notificamos o usuário que seu login e senha não foram identificados
             }
         } catch (Exception e) {
@@ -54,7 +79,15 @@ public class TelaDeLogin extends JFrame
 
         }
     }
-}
+
+    public String setHtmlFormat(String txt) {
+        return "<html><body>" + txt + "</body></html>";
+    }
+
+    public void notificarUsuario(String strTexto) {
+        lblNotificacoes.setText(setHtmlFormat(strTexto));
+    }
+
     public static void main(String[] args) {
         TelaDeLogin appTelaDeLogin = new TelaDeLogin();
         appTelaDeLogin.setDefaultCloseOperation(EXIT_ON_CLOSE);
