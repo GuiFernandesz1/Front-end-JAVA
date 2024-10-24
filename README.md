@@ -1,2 +1,2 @@
 # StartingJava
-That's my first project with program language JAVA | Front-end.
+Projects with JAVA | Front-end.
